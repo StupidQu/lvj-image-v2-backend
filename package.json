@@ -32,12 +32,14 @@
     "dotenv": "^16.4.7",
     "jimp": "^1.6.0",
     "lodash": "^4.17.21",
+    "nestjs-real-ip": "^3.0.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "qiniu": "^7.14.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.7",
+    "turnstile-verify": "1.2.0",
     "typeorm": "^0.3.21"
   },
   "devDependencies": {

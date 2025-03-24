@@ -44,6 +44,9 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      nestjs-real-ip:
+        specifier: ^3.0.1
+        version: 3.0.1(@nestjs/common@11.0.12(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -62,6 +65,9 @@ importers:
       sqlite3:
         specifier: ^5.1.7
         version: 5.1.7
+      turnstile-verify:
+        specifier: 1.2.0
+        version: 1.2.0
       typeorm:
         specifier: ^0.3.21
         version: 0.3.21(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.11.11)(@types/node@22.13.11)(typescript@5.8.2))
@@ -1008,6 +1014,9 @@ packages:
 
   '@sqltools/formatter@1.2.5':
     resolution: {integrity: sha512-Uy0+khmZqUrUGm5dmMqVlnvufZRSK0FbYzVgp0UMstm+F5+W2/jnEEQyc9vo1ZR/E5ZI/B1WjjoTqBqwJL6Krw==}
+
+  '@supercharge/request-ip@1.2.0':
+    resolution: {integrity: sha512-wlt6JW69MHqLY2M6Sm/jVyCojNRKq2CBvwH0Hbx24SFhDQQGkgEjeKxVutDxHSyrWixFaOSLXC27euzxijhyMQ==}
 
   '@swc/cli@0.6.0':
     resolution: {integrity: sha512-Q5FsI3Cw0fGMXhmsg7c08i4EmXCrcl+WnAxb6LYOLHw4JFFC3yzmx9LaXZ7QMbA+JZXbigU2TirI7RAfO0Qlnw==}
@@ -3131,6 +3140,11 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
+  nestjs-real-ip@3.0.1:
+    resolution: {integrity: sha512-vsBlvXBWXg+GorIoXmTasNaJZyeBpTypgnrq1jk9xOEL7FGv9ZFBafyhllliNbSuCDpwxeC7Sxc6hBk8onPXUg==}
+    peerDependencies:
+      '@nestjs/common': '>=8'
+
   node-abi@3.74.0:
     resolution: {integrity: sha512-c5XK0MjkGBrQPGYG24GBADZud0NCbznxNx0ZkS+ebUTrmV1qTDxPxSL8zEAPURXSbLRWVexxmP4986BziahL5w==}
     engines: {node: '>=10'}
@@ -3988,6 +4002,9 @@ packages:
 
   tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
+
+  turnstile-verify@1.2.0:
+    resolution: {integrity: sha512-32jQUHEyTxR9eJWVzKj7Uld98zaAO+gvK9vCZabqn216JOfzHa27APKfIkXDF3qYBCO+1RzICtTLZ6txOLVurQ==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -5375,6 +5392,8 @@ snapshots:
       '@sinonjs/commons': 3.0.1
 
   '@sqltools/formatter@1.2.5': {}
+
+  '@supercharge/request-ip@1.2.0': {}
 
   '@swc/cli@0.6.0(@swc/core@1.11.11)(chokidar@4.0.3)':
     dependencies:
@@ -7843,6 +7862,11 @@ snapshots:
 
   neo-async@2.6.2: {}
 
+  nestjs-real-ip@3.0.1(@nestjs/common@11.0.12(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)):
+    dependencies:
+      '@nestjs/common': 11.0.12(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@supercharge/request-ip': 1.2.0
+
   node-abi@3.74.0:
     dependencies:
       semver: 7.7.1
@@ -8756,6 +8780,8 @@ snapshots:
   tunnel-agent@0.6.0:
     dependencies:
       safe-buffer: 5.2.1
+
+  turnstile-verify@1.2.0: {}
 
   type-check@0.4.0:
     dependencies:

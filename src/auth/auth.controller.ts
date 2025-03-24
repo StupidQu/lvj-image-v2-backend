@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Ip, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from 'src/users/users.service';
 import { Public } from './decorators/public.decorator';
 import { LoginDto } from './dto/login.dto';
 import { CurrentUser, JwtPayload } from './decorators/current-user.decorator';
+import { RealIp } from 'nestjs-real-ip';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +16,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  async register(@Body() body: RegisterDto, @Ip() ip: string) {
+  async register(@Body() body: RegisterDto, @RealIp() ip: string) {
     const user = await this.usersService.register(
       body.name,
       body.password,
@@ -29,7 +30,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  async login(@Body() body: LoginDto, @Ip() ip: string) {
+  async login(@Body() body: LoginDto, @RealIp() ip: string) {
     if (!body.email && !body.name) {
       return { success: false, message: 'Email or username is required.' };
     }

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   DefaultValuePipe,
   Get,
@@ -19,6 +20,8 @@ import {
 } from 'src/auth/decorators/current-user.decorator';
 import { UsersService } from 'src/users/users.service';
 import * as lodash from 'lodash';
+import { TurnstileVerify } from 'turnstile-verify';
+import { RealIP } from 'nestjs-real-ip';
 
 @Controller('upload')
 @UsePipes(FileSizeValidationPipe)
@@ -32,8 +35,22 @@ export class UploadController {
   @UseInterceptors(FilesInterceptor('file'))
   async upload(
     @UploadedFiles() files: Express.Multer.File[],
+    @Body('turnstileToken') turnstileToken: string,
     @CurrentUser() up: JwtPayload,
+    @RealIP() ip: string,
   ) {
+    const turnstile = new TurnstileVerify({
+      token: process.env.CLOUDFLAER_TURNSTILE_SECRET!,
+    });
+
+    const turnstileResponse = await turnstile.validate({
+      response: turnstileToken,
+      remoteip: ip,
+    });
+
+    if (!turnstileResponse.valid)
+      throw new BadRequestException('Invalid captcha');
+
     const user = await this.usersService.getByName(up.name);
 
     const uploads = [];
