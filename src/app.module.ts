@@ -10,6 +10,7 @@ import { UploadModule } from './upload/upload.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ShortlinkModule } from './shortlink/shortlink.module';
+import { ApiModule } from './api/api.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ShortlinkModule } from './shortlink/shortlink.module';
     }),
     UploadModule,
     ShortlinkModule,
+    ApiModule,
   ],
   controllers: [],
   providers: [

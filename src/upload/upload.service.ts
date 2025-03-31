@@ -23,7 +23,7 @@ export class UploadService {
     );
   }
 
-  private async uploadToQiniu(file: Buffer, key: string) {
+  public async uploadToQiniu(file: Buffer, key: string) {
     const policy = new qiniu.rs.PutPolicy({
       scope: `${this.configService.get('QINIU_BUCKET')}:${key}`,
     });
