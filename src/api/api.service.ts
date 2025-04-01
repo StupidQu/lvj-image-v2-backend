@@ -18,22 +18,37 @@ export class ApiService {
 
   // 创建工作量证明挑战
   async createChallenge(ip: string): Promise<Challenge> {
-    // 检查 24 小时内 IP 上传的图片数量
-    const oneDayAgo = new Date();
-    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+    // 检查每分钟挑战次数限制（最多30次/分钟）
+    const oneMinuteAgo = new Date();
+    oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
 
-    const uploadsLast24Hours = await this.apiUploadRepository.count({
+    const challengesLastMinute = await this.challengeRepository.count({
       where: {
         ip,
-        createdAt: MoreThanOrEqual(oneDayAgo),
+        createdAt: MoreThanOrEqual(oneMinuteAgo),
       },
     });
 
-    // 根据 24 小时内上传的图片数量计算难度 N
+    if (challengesLastMinute >= 30) {
+      throw new BadRequestException('请求过于频繁，请稍后再试');
+    }
+
+    // 检查 3 小时内 IP 上传的图片数量
+    const threeHoursAgo = new Date();
+    threeHoursAgo.setHours(threeHoursAgo.getHours() - 3);
+
+    const uploadsLast3Hours = await this.apiUploadRepository.count({
+      where: {
+        ip,
+        createdAt: MoreThanOrEqual(threeHoursAgo),
+      },
+    });
+
+    // 根据 3 小时内上传的图片数量计算难度 N
     // N = max(4, min(20, log_1.5(16*X)))
     let N = 4;
-    if (uploadsLast24Hours > 0) {
-      const x = uploadsLast24Hours;
+    if (uploadsLast3Hours > 0) {
+      const x = uploadsLast3Hours;
       const calculatedN = Math.floor(Math.log(16 * x) / Math.log(1.5));
       N = Math.max(4, Math.min(20, calculatedN));
     }
@@ -135,6 +150,15 @@ export class ApiService {
       .createHash('sha256')
       .update(processedFile)
       .digest('hex');
+
+    // 检查文件是否已存在
+    const existingUpload = await this.apiUploadRepository.findOne({
+      where: { sha256 },
+    });
+
+    if (existingUpload) {
+      return existingUpload;
+    }
 
     // 生成文件名
     const name = `${sha256}.png`;
