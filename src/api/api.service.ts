@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThanOrEqual } from 'typeorm';
+import { Repository, MoreThanOrEqual, IsNull } from 'typeorm';
 import { Challenge } from './entity/challenge.entity';
 import { ApiUpload } from './entity/api-upload.entity';
 import * as crypto from 'crypto';
@@ -18,6 +18,12 @@ export class ApiService {
 
   // 创建工作量证明挑战
   async createChallenge(ip: string): Promise<Challenge> {
+    // 删除之前所有的未解决的挑战
+    await this.challengeRepository.delete({
+      ip,
+      solvedAt: IsNull(),
+    });
+
     // 检查每分钟挑战次数限制（最多30次/分钟）
     const oneMinuteAgo = new Date();
     oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
