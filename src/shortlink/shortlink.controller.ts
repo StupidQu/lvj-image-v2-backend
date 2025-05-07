@@ -24,6 +24,11 @@ export class ShortlinkController {
       throw new NotFoundException('图片未找到');
     }
 
+    // Check if shortlink access is allowed for this upload
+    if (!upload.useShortlink) {
+      throw new NotFoundException('此图片不允许通过短链访问');
+    }
+
     // 返回重定向URL
     return {
       url: upload.url,

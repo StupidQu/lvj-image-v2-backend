@@ -24,6 +24,9 @@ export class Upload {
   @Column({ nullable: true })
   legacyShortlink?: string;
 
+  @Column({ default: true })
+  useShortlink: boolean;
+
   @ManyToOne(() => User, (user) => user.uploads)
   @JoinColumn({ name: 'userId' })
   user: User;

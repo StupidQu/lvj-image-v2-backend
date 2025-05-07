@@ -4,6 +4,7 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Query,
@@ -36,6 +37,8 @@ export class UploadController {
   async upload(
     @UploadedFiles() files: Express.Multer.File[],
     @Body('turnstileToken') turnstileToken: string,
+    @Body('useShortlink', new DefaultValuePipe(true), ParseBoolPipe)
+    useShortlink: boolean,
     @CurrentUser() up: JwtPayload,
     @RealIP() ip: string,
   ) {
@@ -56,7 +59,11 @@ export class UploadController {
     const uploads = [];
     for (const file of files) {
       const processed = await this.uploadService.preprocess(file);
-      const upload = await this.uploadService.upload(processed, user!);
+      const upload = await this.uploadService.upload(
+        processed,
+        user!,
+        useShortlink,
+      );
       uploads.push(lodash.omit(upload, ['user']));
     }
 

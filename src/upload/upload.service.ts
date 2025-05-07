@@ -64,7 +64,7 @@ export class UploadService {
     }
   }
 
-  async upload(file: Buffer, user: User) {
+  async upload(file: Buffer, user: User, useShortlink: boolean = true) {
     const sha256 = crypto.createHash('sha256').update(file).digest('hex');
     let upload = await this.uploadRepository.findOne({
       where: {
@@ -87,6 +87,7 @@ export class UploadService {
     upload.url = url;
     upload.size = file.byteLength;
     upload.user = user;
+    upload.useShortlink = useShortlink;
 
     await this.uploadRepository.save(upload);
     return upload;
