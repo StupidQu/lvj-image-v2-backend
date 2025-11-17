@@ -31,7 +31,7 @@ export class EmailService {
           TemplateID: Number(
             this.configService.get<string>('TENCENT_SES_TEMPLATE_ID')!,
           ),
-          TemplateData: JSON.stringify({ code }),
+          TemplateData: JSON.stringify({ verifyCode: code, username: email }),
         },
         TriggerType: 1, // 触发类邮件
       };

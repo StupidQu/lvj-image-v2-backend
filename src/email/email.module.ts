@@ -8,4 +8,3 @@ import { ConfigModule } from '@nestjs/config';
   exports: [EmailService],
 })
 export class EmailModule {}
-
