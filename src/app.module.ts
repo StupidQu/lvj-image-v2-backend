@@ -11,6 +11,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ShortlinkModule } from './shortlink/shortlink.module';
 import { ApiModule } from './api/api.module';
+import { EmailVerification } from './auth/entity/email-verification.entity';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { ApiModule } from './api/api.module';
       type: 'sqlite',
       database: process.env.SQLITE_DB_PATH,
       autoLoadEntities: true,
-      entities: [User],
+      entities: [User, EmailVerification],
       synchronize: true,
     }),
     UploadModule,

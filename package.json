@@ -39,6 +39,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.7",
+    "tencentcloud-sdk-nodejs-ses": "^4.1.76",
     "turnstile-verify": "1.2.0",
     "typeorm": "^0.3.21"
   },
@@ -92,6 +93,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@nestjs/core",
+      "@swc/core",
       "sqlite3"
     ]
   }

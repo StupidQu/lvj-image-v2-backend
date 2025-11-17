@@ -15,4 +15,10 @@ export class RegisterDto {
 
   @IsEmail()
   email: string;
+
+  @IsString()
+  @Length(6, 6)
+  @Matches(/^[0-9]{6}$/)
+  @Transform(({ value }: { value: string }) => value.trim())
+  code: string;
 }
