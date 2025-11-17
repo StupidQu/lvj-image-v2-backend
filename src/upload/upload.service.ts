@@ -1,7 +1,11 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Upload } from './entity/upload.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Jimp } from 'jimp';
 import * as crypto from 'crypto';
 import * as qiniu from 'qiniu';
@@ -10,6 +14,8 @@ import { User } from 'src/users/entity/user.entity';
 
 @Injectable()
 export class UploadService {
+  private static readonly DAILY_UPLOAD_LIMIT = 20;
+  private static readonly MONTHLY_UPLOAD_LIMIT = 200;
   private qiniuMac: qiniu.auth.digest.Mac;
 
   constructor(
@@ -73,6 +79,8 @@ export class UploadService {
     });
     if (upload) return upload;
 
+    await this.ensureUploadLimits(user);
+
     const name = `${sha256}.png`;
     const result = await this.uploadToQiniu(file, name);
     if (!result.ok()) {
@@ -120,5 +128,41 @@ export class UploadService {
 
   async getByLegacyShortlink(link: string) {
     return this.uploadRepository.findOneBy({ legacyShortlink: link });
+  }
+
+  private async ensureUploadLimits(user: User) {
+    const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const [dailyCount, monthlyCount] = await Promise.all([
+      this.countUploadsWithin(user, startOfDay, now),
+      this.countUploadsWithin(user, startOfMonth, now),
+    ]);
+
+    if (dailyCount >= UploadService.DAILY_UPLOAD_LIMIT) {
+      throw new BadRequestException(
+        `Daily upload limit of ${UploadService.DAILY_UPLOAD_LIMIT} reached.`,
+      );
+    }
+
+    if (monthlyCount >= UploadService.MONTHLY_UPLOAD_LIMIT) {
+      throw new BadRequestException(
+        `Monthly upload limit of ${UploadService.MONTHLY_UPLOAD_LIMIT} reached.`,
+      );
+    }
+  }
+
+  private async countUploadsWithin(user: User, start: Date, end: Date) {
+    return this.uploadRepository.count({
+      where: {
+        user: {
+          id: user.id,
+        },
+        createdAt: Between(start, end),
+      },
+    });
   }
 }

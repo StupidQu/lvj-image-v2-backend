@@ -1,6 +1,7 @@
 import { User } from 'src/users/entity/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -30,4 +31,7 @@ export class Upload {
   @ManyToOne(() => User, (user) => user.uploads)
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
