@@ -19,7 +19,11 @@ export class EmailService {
     });
   }
 
-  async sendVerificationCode(email: string, code: string): Promise<boolean> {
+  async sendVerificationCode(
+    email: string,
+    code: string,
+    username: string,
+  ): Promise<boolean> {
     try {
       const params = {
         FromEmailAddress: this.configService.get<string>(
@@ -31,7 +35,7 @@ export class EmailService {
           TemplateID: Number(
             this.configService.get<string>('TENCENT_SES_TEMPLATE_ID')!,
           ),
-          TemplateData: JSON.stringify({ verifyCode: code, username: email }),
+          TemplateData: JSON.stringify({ verifyCode: code, username }),
         },
         TriggerType: 1, // 触发类邮件
       };

@@ -22,6 +22,18 @@ export class AuthController {
   @Public()
   @Post('send-code')
   async sendCode(@Body() body: SendCodeDto, @RealIp() ip: string) {
+    const user = await this.usersService.getByName(body.username);
+    if (user) {
+      if (user.email !== body.email) {
+        return { success: false, message: '用户名与邮箱不匹配' };
+      }
+    } else {
+      const existingUser = await this.usersService.getByEmail(body.email);
+      if (existingUser) {
+        return { success: false, message: '该邮箱已被使用' };
+      }
+    }
+
     const limitCheck = await this.verificationService.checkSendLimit(
       body.email,
       ip,
@@ -33,7 +45,11 @@ export class AuthController {
       body.email,
       ip,
     );
-    const sent = await this.emailService.sendVerificationCode(body.email, code);
+    const sent = await this.emailService.sendVerificationCode(
+      body.email,
+      code,
+      body.username,
+    );
     if (!sent) {
       return { success: false, message: '邮件发送失败，请稍后重试' };
     }

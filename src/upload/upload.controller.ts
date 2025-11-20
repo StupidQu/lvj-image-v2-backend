@@ -32,6 +32,13 @@ export class UploadController {
     private readonly usersService: UsersService,
   ) {}
 
+  @Get('/challenge')
+  async getChallenge(@CurrentUser() up: JwtPayload) {
+    const user = await this.usersService.getByName(up.name);
+    const turnstile = await this.uploadService.shouldTurnstile(user!);
+    return { turnstile };
+  }
+
   @Post()
   @UseInterceptors(FilesInterceptor('file'))
   async upload(
@@ -42,19 +49,22 @@ export class UploadController {
     @CurrentUser() up: JwtPayload,
     @RealIP() ip: string,
   ) {
-    const turnstile = new TurnstileVerify({
-      token: process.env.CLOUDFLAER_TURNSTILE_SECRET!,
-    });
-
-    const turnstileResponse = await turnstile.validate({
-      response: turnstileToken,
-      remoteip: ip,
-    });
-
-    if (!turnstileResponse.valid)
-      throw new BadRequestException('Invalid captcha');
-
     const user = await this.usersService.getByName(up.name);
+    const shouldTurnstile = await this.uploadService.shouldTurnstile(user!);
+
+    if (shouldTurnstile) {
+      const turnstile = new TurnstileVerify({
+        token: process.env.CLOUDFLAER_TURNSTILE_SECRET!,
+      });
+
+      const turnstileResponse = await turnstile.validate({
+        response: turnstileToken,
+        remoteip: ip,
+      });
+
+      if (!turnstileResponse.valid)
+        throw new BadRequestException('Invalid captcha');
+    }
 
     const uploads = [];
     for (const file of files) {

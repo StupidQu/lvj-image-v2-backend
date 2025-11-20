@@ -130,6 +130,23 @@ export class UploadService {
     return this.uploadRepository.findOneBy({ legacyShortlink: link });
   }
 
+  async shouldTurnstile(user: User): Promise<boolean> {
+    const now = new Date();
+    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [count3h, count7d] = await Promise.all([
+      this.countUploadsWithin(user, threeHoursAgo, now),
+      this.countUploadsWithin(user, sevenDaysAgo, now),
+    ]);
+
+    if (count3h < 5 && count7d < 20) {
+      return false;
+    }
+
+    return true;
+  }
+
   private async ensureUploadLimits(user: User) {
     const now = new Date();
     const startOfDay = new Date(now);
