@@ -12,6 +12,12 @@ import { EmailService } from 'src/email/email.service';
 
 @Controller('auth')
 export class AuthController {
+  private readonly registrationPausedMessage = '注册暂时关闭';
+
+  private isRegistrationPaused() {
+    return true;
+  }
+
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
@@ -31,6 +37,9 @@ export class AuthController {
       const existingUser = await this.usersService.getByEmail(body.email);
       if (existingUser) {
         return { success: false, message: '该邮箱已被使用' };
+      }
+      if (this.isRegistrationPaused()) {
+        return { success: false, message: this.registrationPausedMessage };
       }
     }
 
@@ -60,6 +69,10 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() body: RegisterDto, @RealIp() ip: string) {
+    if (this.isRegistrationPaused()) {
+      return { success: false, message: this.registrationPausedMessage };
+    }
+
     const validation = await this.verificationService.validateCode(
       body.email,
       body.code,
