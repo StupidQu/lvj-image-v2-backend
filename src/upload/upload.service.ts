@@ -14,8 +14,8 @@ import { User } from 'src/users/entity/user.entity';
 
 @Injectable()
 export class UploadService {
-  private static readonly DAILY_UPLOAD_LIMIT = 20;
-  private static readonly MONTHLY_UPLOAD_LIMIT = 200;
+  private static readonly DAILY_UPLOAD_LIMIT = 50;
+  private static readonly MONTHLY_UPLOAD_LIMIT = 500;
   private qiniuMac: qiniu.auth.digest.Mac;
 
   constructor(
@@ -133,18 +133,17 @@ export class UploadService {
   async shouldTurnstile(user: User): Promise<boolean> {
     const now = new Date();
     const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    const [count3h, count7d] = await Promise.all([
+    const [count3h, countToday, count7d] = await Promise.all([
       this.countUploadsWithin(user, threeHoursAgo, now),
+      this.countUploadsWithin(user, startOfDay, now),
       this.countUploadsWithin(user, sevenDaysAgo, now),
     ]);
 
-    if (count3h < 5 && count7d < 20) {
-      return false;
-    }
-
-    return true;
+    return count3h >= 10 || countToday >= 30 || count7d >= 200;
   }
 
   private async ensureUploadLimits(user: User) {
